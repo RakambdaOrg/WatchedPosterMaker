@@ -13,8 +13,8 @@ data class AppConfiguration(
     @field:JsonProperty("tmdb") val tmdb: Tmdb,
 ) {
     companion object {
-        val instance by lazy { read(File("config.yaml")) }
-        
+        val instance by lazy { read(File(System.getProperty("fr.rakambda.configLocation") ?: "config.yaml")) }
+
         private fun read(file: File): AppConfiguration {
             val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
             return mapper.readerFor(AppConfiguration::class.java).readValue(file)
