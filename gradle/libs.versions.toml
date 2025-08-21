@@ -1,0 +1,30 @@
+[versions]
+jacksonVersion = "2.19.2"
+dotenvVersion = "6.5.1"
+logbackVersion = "1.5.18"
+logbackEcsVersion = "1.7.0"
+kotlinLoggingVersion = "7.0.11"
+exposedVersion = "0.61.0"
+mariadbVersion = "3.5.5"
+sqliteVersion = "3.50.3.0"
+
+[libraries]
+jacksonKotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jacksonVersion" }
+jacksonYaml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-yaml", version.ref = "jacksonVersion" }
+dotenvKotlin = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "dotenvVersion" }
+kotlinLogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLoggingVersion" }
+logbackClassic = { group = "ch.qos.logback", name = "logback-classic", version.ref = 'logbackVersion' }
+logbackEcs = { group = "co.elastic.logging", name = "logback-ecs-encoder", version.ref = "logbackEcsVersion" }
+exposedCore = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposedVersion" }
+exposedJdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposedVersion" }
+exposedJavaTime = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposedVersion" }
+mariadb = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadbVersion" }
+sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqliteVersion" }
+
+
+[bundles]
+jackson = ["jacksonKotlin", "jacksonYaml"]
+logging = ["kotlinLogging", "logbackClassic", "logbackEcs"]
+exposed = ["exposedCore", "exposedJdbc", "exposedJavaTime"]
+
+[plugins]

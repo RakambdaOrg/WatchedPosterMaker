@@ -1,0 +1,21 @@
+#include "./fragment/media.gql"
+#include "./fragment/pageInfo.gql"
+
+query($page: Int, $perPage: Int, $userId: Int, $date: Int) {
+    page: Page(page: $page, perPage: $perPage){
+        pageInfo {
+            ...PageInfoParts
+        }
+        elements: activities(userId: $userId, type: MEDIA_LIST, createdAt_greater: $date) {
+            ... on ListActivity {
+                id
+                createdAt
+                media {
+                    ...MediaParts
+                }
+                progress
+                status
+            }
+        }
+    }
+}

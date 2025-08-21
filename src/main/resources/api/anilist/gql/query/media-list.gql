@@ -1,0 +1,18 @@
+#include "./fragment/media.gql"
+#include "./fragment/pageInfo.gql"
+
+query($page: Int, $perPage: Int, $userId: Int) {
+    page: Page(page: $page, perPage: $perPage){
+        pageInfo {
+            ...PageInfoParts
+        }
+        elements: mediaList(userId: $userId, sort: UPDATED_TIME_DESC) {
+            id
+            updatedAt
+            media {
+                ...MediaParts
+            }
+            progress
+        }
+    }
+}

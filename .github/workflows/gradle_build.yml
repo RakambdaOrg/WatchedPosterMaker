@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: RakambdaOrg/rakambda-github-workflows/.github/workflows/gradle-build.yml@main
+    with:
+      java-version: ${{ vars.JAVA_VERSION }}
+
+  docker:
+    uses: RakambdaOrg/rakambda-github-workflows/.github/workflows/gradle-ktor-publish.yml@main
+    if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    needs:
+      - build
+    with:
+      java-version: ${{ vars.JAVA_VERSION }}
+      docker-image: ${{ vars.DOCKER_IMAGE }}
+      docker-tag: latest
+      environment: DockerSelfHosted
+    secrets:
+      docker-repo: ${{ secrets.DOCKER_REPO }}
+      docker-username: ${{ secrets.DOCKER_USERNAME }}
+      docker-token: ${{ secrets.DOCKER_TOKEN }}

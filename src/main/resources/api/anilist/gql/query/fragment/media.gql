@@ -1,0 +1,8 @@
+fragment MediaParts on Media {
+    id
+    coverImage {
+        large
+        extraLarge
+    }
+    type
+}
