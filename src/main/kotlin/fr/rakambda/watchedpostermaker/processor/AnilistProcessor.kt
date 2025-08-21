@@ -11,6 +11,7 @@ import fr.rakambda.watchedpostermaker.util.fixed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.net.URI
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class AnilistProcessor(
     private val executionCache: ExecutionCache
@@ -33,7 +34,7 @@ class AnilistProcessor(
         config.output.mkdirs()
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
-        val previousActivityDate = Instant.ofEpochSecond(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), "0").toLong())
+        val previousActivityDate = Instant.ofEpochSecond(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong())
 
         val activities = AnilistApi.getUserActivity(userId, previousActivityDate)
         logger.info { "Found ${activities.size} new AniList activities" }
@@ -46,7 +47,7 @@ class AnilistProcessor(
         config.output.mkdirs()
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
-        val previousUpdateDate = Instant.ofEpochSecond(executionCache.getOrDefault(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), "0").toLong())
+        val previousUpdateDate = Instant.ofEpochSecond(executionCache.getOrDefault(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong())
 
         val medias = AnilistApi.getUserMediaList(userId, previousUpdateDate)
         logger.info { "Found ${medias.size} new AniList media list updates" }
