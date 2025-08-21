@@ -68,8 +68,7 @@ object TraktApi {
                         if (since != null) parameters.append("start_at", ISO_DATE_TIME.format(ZonedDateTime.ofInstant(since, UTC)))
                     }
                 }).let { Pair(it.first.headers, it.second) }
-            },
-            maxPages = 10
+            }
         )
     }
 

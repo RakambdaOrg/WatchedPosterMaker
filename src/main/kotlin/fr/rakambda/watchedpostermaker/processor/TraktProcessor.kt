@@ -10,6 +10,7 @@ import fr.rakambda.watchedpostermaker.util.clone
 import fr.rakambda.watchedpostermaker.util.fixed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class TraktProcessor(
     private val executionCache: ExecutionCache
@@ -29,7 +30,7 @@ class TraktProcessor(
         config.output.mkdirs()
 
         val username = TraktApi.getUsername()
-        val previousActivityDate = Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, username, "0").toLong())
+        val previousActivityDate = Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, username, Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong())
 
         val activities = TraktApi.getUserActivity(username, previousActivityDate.plusSeconds(1))
         logger.info { "Found ${activities.size} new Trakt activities" }
