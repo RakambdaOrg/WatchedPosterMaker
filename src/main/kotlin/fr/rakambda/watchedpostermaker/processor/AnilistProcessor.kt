@@ -63,7 +63,7 @@ class AnilistProcessor(
         logger.info { "Found ${medias.size} new AniList media list updates since $previousUpdateDate" }
         medias.forEach { makePosterFromMediaList(it) }
 
-        executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), medias.maxOfOrNull { it.updatedAt }?.toInstant().toString())
+        executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), medias.maxOfOrNull { it.updatedAt }?.toInstant()?.toEpochMilli().toString())
     }
 
     private suspend fun makePosterFromActivity(activity: AnilistApi.GqlResponse.ActivityData) {
