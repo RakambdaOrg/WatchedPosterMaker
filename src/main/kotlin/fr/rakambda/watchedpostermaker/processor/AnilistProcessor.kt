@@ -38,13 +38,16 @@ class AnilistProcessor(
         config.output.mkdirs()
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
-        val previousActivityDate = Instant.ofEpochSecond(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong())
+        val previousActivityDate = ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong()),
+            ZoneId.systemDefault()
+        )
 
         val activities = AnilistApi.getUserActivity(userId, previousActivityDate)
         logger.info { "Found ${activities.size} new AniList activities since $previousActivityDate" }
         activities.forEach { makePosterFromActivity(it) }
 
-        executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), activities.maxOfOrNull { it.createdAt }?.toString())
+        executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), activities.maxOfOrNull { it.createdAt }?.toInstant()?.toEpochMilli()?.toString())
     }
 
     private suspend fun processFromHistory() {
@@ -60,7 +63,7 @@ class AnilistProcessor(
         logger.info { "Found ${medias.size} new AniList media list updates since $previousUpdateDate" }
         medias.forEach { makePosterFromMediaList(it) }
 
-        executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), medias.maxOfOrNull { it.updatedAt }?.toString())
+        executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), medias.maxOfOrNull { it.updatedAt }?.toInstant().toString())
     }
 
     private suspend fun makePosterFromActivity(activity: AnilistApi.GqlResponse.ActivityData) {

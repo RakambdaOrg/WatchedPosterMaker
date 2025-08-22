@@ -57,13 +57,13 @@ object AnilistApi {
 
     suspend fun getUserActivity(
         userId: Int,
-        since: Instant = Instant.EPOCH,
+        since: ZonedDateTime = ZonedDateTime.ofInstant(Instant.EPOCH, UTC),
     ): List<GqlResponse.ActivityData> {
         val result = postPagedGql<GqlResponse.ActivityData>(
             "activity",
             mapOf(
                 "userId" to userId,
-                "date" to since.epochSecond
+                "date" to since.toEpochSecond()
             )
         )
         return result
