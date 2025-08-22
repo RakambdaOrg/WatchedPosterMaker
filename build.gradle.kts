@@ -12,6 +12,9 @@ repositories {
 }
 
 dependencies {
+    implementation(platform(libs.jacksonBom))
+    implementation(platform(libs.log4j2Bom))
+    
     implementation(libs.dotenvKotlin)
     implementation(libs.bundles.logging)
     implementation(libs.bundles.jackson)

@@ -1,20 +1,22 @@
 [versions]
 jacksonVersion = "2.19.2"
 dotenvVersion = "6.5.1"
-logbackVersion = "1.5.18"
-logbackEcsVersion = "1.7.0"
+log4j2-version = "2.25.1"
 kotlinLoggingVersion = "7.0.13"
 exposedVersion = "0.61.0"
 mariadbVersion = "3.5.5"
 sqliteVersion = "3.50.3.0"
 
 [libraries]
-jacksonKotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jacksonVersion" }
-jacksonYaml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-yaml", version.ref = "jacksonVersion" }
+jacksonBom = { group = "com.fasterxml.jackson", name = "jackson-bom", version.ref = "jacksonVersion"}
+jacksonKotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin" }
+jacksonYaml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-yaml" }
 dotenvKotlin = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "dotenvVersion" }
 kotlinLogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLoggingVersion" }
-logbackClassic = { group = "ch.qos.logback", name = "logback-classic", version.ref = 'logbackVersion' }
-logbackEcs = { group = "co.elastic.logging", name = "logback-ecs-encoder", version.ref = "logbackEcsVersion" }
+log4j2Bom = { group = "org.apache.logging.log4j", name = "log4j-bom", version.ref = "log4j2-version"}
+log4j2-core = { group = "org.apache.logging.log4j", name = "log4j-core" }
+log4j2-slf4j = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl" }
+log4j2-json = { group = "org.apache.logging.log4j", name = "log4j-layout-template-json" }
 exposedCore = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposedVersion" }
 exposedJdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposedVersion" }
 exposedJavaTime = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposedVersion" }
@@ -24,7 +26,7 @@ sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqliteVers
 
 [bundles]
 jackson = ["jacksonKotlin", "jacksonYaml"]
-logging = ["kotlinLogging", "logbackClassic", "logbackEcs"]
+logging = ["kotlinLogging", "log4j2-core", "log4j2-slf4j", "log4j2-json"]
 exposed = ["exposedCore", "exposedJdbc", "exposedJavaTime"]
 
 [plugins]
