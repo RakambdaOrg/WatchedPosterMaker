@@ -17,7 +17,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import java.time.Instant
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_DATE_TIME
@@ -57,7 +56,7 @@ object TraktApi {
         return result.second.user.username
     }
 
-    suspend fun getUserActivity(username: String, since: Instant?): List<TraktResponse.UserHistory> {
+    suspend fun getUserActivity(username: String, since: ZonedDateTime?): List<TraktResponse.UserHistory> {
         return pagedQuery(
             { page ->
                 handleResponse<List<TraktResponse.UserHistory>>(client.get {
@@ -65,7 +64,7 @@ object TraktApi {
                         appendPathSegments("users", username, "history")
                         parameters.append("page", page.toString())
                         parameters.append("limit", 15.toString())
-                        if (since != null) parameters.append("start_at", ISO_DATE_TIME.format(ZonedDateTime.ofInstant(since, UTC)))
+                        if (since != null) parameters.append("start_at", ISO_DATE_TIME.format(since.withZoneSameInstant(UTC)))
                     }
                 }).let { Pair(it.first.headers, it.second) }
             }

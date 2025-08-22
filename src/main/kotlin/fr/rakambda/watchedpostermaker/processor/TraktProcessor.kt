@@ -10,6 +10,9 @@ import fr.rakambda.watchedpostermaker.util.clone
 import fr.rakambda.watchedpostermaker.util.fixed
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 class TraktProcessor(
@@ -20,6 +23,7 @@ class TraktProcessor(
 
     companion object {
         private const val CACHE_CATEGORY_LAST_ACTIVITY = "trakt_activity_last-date"
+        private val DF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH.mm.ss")
     }
 
     suspend fun process() {
@@ -30,7 +34,10 @@ class TraktProcessor(
         config.output.mkdirs()
 
         val username = TraktApi.getUsername()
-        val previousActivityDate = Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, username, Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong())
+        val previousActivityDate = ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, username, Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong()),
+            ZoneId.systemDefault()
+        )
 
         val activities = TraktApi.getUserActivity(username, previousActivityDate.plusSeconds(1))
         logger.info { "Found ${activities.size} new Trakt activities" }
@@ -40,20 +47,20 @@ class TraktProcessor(
     }
 
     private suspend fun makePosterFromActivity(activity: TraktApi.TraktResponse.UserHistory) {
-        activity.movie?.let { makePosterFromMovie(it) }
-        if (activity.show != null && activity.episode != null) makePosterFromShow(activity.show, activity.episode)
+        activity.movie?.let { makePosterFromMovie(activity.watchedAt, it) }
+        if (activity.show != null && activity.episode != null) makePosterFromShow(activity.watchedAt, activity.show, activity.episode)
     }
 
-    private suspend fun makePosterFromMovie(media: TraktApi.TraktResponse.UserHistory.Media) {
-        makePoster(media, "", PosterLoader.TmdbPosterLoader.forMovie(media.ids.tmdb))
+    private suspend fun makePosterFromMovie(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media) {
+        makePoster(watchedAt, media, "", PosterLoader.TmdbPosterLoader.forMovie(media.ids.tmdb))
     }
 
-    private suspend fun makePosterFromShow(media: TraktApi.TraktResponse.UserHistory.Media, episode: TraktApi.TraktResponse.UserHistory.Episode) {
-        makePoster(media, "S${episode.season.fixed(2)}E${episode.number.fixed(2)}", PosterLoader.TmdbPosterLoader.forTv(media.ids.tmdb))
+    private suspend fun makePosterFromShow(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, episode: TraktApi.TraktResponse.UserHistory.Episode) {
+        makePoster(watchedAt, media, "S${episode.season.fixed(2)}E${episode.number.fixed(2)}", PosterLoader.TmdbPosterLoader.forTv(media.ids.tmdb))
     }
 
-    private suspend fun makePoster(media: TraktApi.TraktResponse.UserHistory.Media, text: String, posterLoader: PosterLoader) {
-        val outFile = config.output.resolve("trakt-${media.ids.tmdb}-$text.png")
+    private suspend fun makePoster(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, text: String, posterLoader: PosterLoader) {
+        val outFile = config.output.resolve("${DF.format(watchedAt.withZoneSameInstant(ZoneId.systemDefault()))}-trakt-${media.ids.tmdb}-$text.png")
         if (outFile.exists()) return
 
         logger.info { "Creating poster for media `${media.ids.tmdb}` at `$text`. Will be saved at `$outFile`" }

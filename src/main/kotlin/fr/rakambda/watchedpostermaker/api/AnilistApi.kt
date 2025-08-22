@@ -1,8 +1,10 @@
 package fr.rakambda.watchedpostermaker.api
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import fr.rakambda.watchedpostermaker.AppConfiguration
 import fr.rakambda.watchedpostermaker.util.GraphQlUtils
+import fr.rakambda.watchedpostermaker.util.JacksonUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -16,6 +18,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import java.time.Instant
+import java.time.ZoneOffset.UTC
+import java.time.ZonedDateTime
 
 object AnilistApi {
     private val logger = KotlinLogging.logger {}
@@ -67,16 +71,16 @@ object AnilistApi {
 
     suspend fun getUserMediaList(
         userId: Int,
-        since: Instant = Instant.EPOCH,
+        since: ZonedDateTime = ZonedDateTime.ofInstant(Instant.EPOCH, UTC),
     ): List<GqlResponse.MediaListData> {
         val result = postPagedGql<GqlResponse.MediaListData>(
             "media-list",
             mapOf(
                 "userId" to userId,
             ),
-            halter = { l -> l.any { it.updatedAt < since.epochSecond } }
+            halter = { l -> l.any { it.updatedAt.isBefore(since) } }
         )
-        return result.filter { it.updatedAt >= since.epochSecond }
+        return result.filterNot { since.isBefore(it.updatedAt) }
     }
 
     private suspend inline fun <reified T> postPagedGql(
@@ -168,7 +172,7 @@ object AnilistApi {
 
         data class ActivityData(
             val id: Int,
-            val createdAt: Int,
+            @field:JsonDeserialize(using = JacksonUtils.SQLTimestampDeserializer::class) val createdAt: ZonedDateTime,
             val media: Media,
             val status: String,
             val progress: String? = null,
@@ -176,7 +180,7 @@ object AnilistApi {
 
         data class MediaListData(
             val id: Int,
-            val updatedAt: Int,
+            @field:JsonDeserialize(using = JacksonUtils.SQLTimestampDeserializer::class) val updatedAt: ZonedDateTime,
             val media: Media,
             val progress: Int,
         )
