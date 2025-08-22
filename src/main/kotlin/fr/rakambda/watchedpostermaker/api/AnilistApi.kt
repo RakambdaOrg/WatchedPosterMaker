@@ -80,7 +80,7 @@ object AnilistApi {
             ),
             halter = { l -> l.any { it.updatedAt.isBefore(since) } }
         )
-        return result.filterNot { since.isBefore(it.updatedAt) }
+        return result.filterNot { since.isAfter(it.updatedAt) }
     }
 
     private suspend inline fun <reified T> postPagedGql(

@@ -59,7 +59,7 @@ class AnilistProcessor(
             ZoneId.systemDefault()
         )
 
-        val medias = AnilistApi.getUserMediaList(userId, previousUpdateDate)
+        val medias = AnilistApi.getUserMediaList(userId, previousUpdateDate.plusSeconds(1))
         logger.info { "Found ${medias.size} new AniList media list updates since $previousUpdateDate" }
         medias.forEach { makePosterFromMediaList(it) }
 
