@@ -55,7 +55,7 @@ class AnilistProcessor(
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
         val previousUpdateDate = ZonedDateTime.ofInstant(
-            Instant.ofEpochSecond(executionCache.getOrDefault(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong()),
+            Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong()),
             ZoneId.systemDefault()
         )
 
