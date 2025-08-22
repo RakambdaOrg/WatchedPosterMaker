@@ -41,7 +41,7 @@ class AnilistProcessor(
         val previousActivityDate = Instant.ofEpochSecond(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong())
 
         val activities = AnilistApi.getUserActivity(userId, previousActivityDate)
-        logger.info { "Found ${activities.size} new AniList activities" }
+        logger.info { "Found ${activities.size} new AniList activities since $previousActivityDate" }
         activities.forEach { makePosterFromActivity(it) }
 
         executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), activities.maxOfOrNull { it.createdAt }?.toString())
@@ -57,7 +57,7 @@ class AnilistProcessor(
         )
 
         val medias = AnilistApi.getUserMediaList(userId, previousUpdateDate)
-        logger.info { "Found ${medias.size} new AniList media list updates" }
+        logger.info { "Found ${medias.size} new AniList media list updates since $previousUpdateDate" }
         medias.forEach { makePosterFromMediaList(it) }
 
         executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), medias.maxOfOrNull { it.updatedAt }?.toString())

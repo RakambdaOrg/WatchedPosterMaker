@@ -40,7 +40,7 @@ class TraktProcessor(
         )
 
         val activities = TraktApi.getUserActivity(username, previousActivityDate.plusSeconds(1))
-        logger.info { "Found ${activities.size} new Trakt activities" }
+        logger.info { "Found ${activities.size} new Trakt activities since $previousActivityDate" }
         activities.forEach { makePosterFromActivity(it) }
 
         executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, username, activities.maxOfOrNull { it.watchedAt }?.toInstant()?.toEpochMilli()?.toString())
