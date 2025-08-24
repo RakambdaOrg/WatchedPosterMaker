@@ -1,4 +1,4 @@
-package fr.rakambda.tools.api.cache
+package fr.rakambda.watchedpostermaker.tools.api.cache
 
 import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.sql.javatime.timestamp

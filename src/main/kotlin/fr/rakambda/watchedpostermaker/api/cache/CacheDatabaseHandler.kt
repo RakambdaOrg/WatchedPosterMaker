@@ -1,4 +1,4 @@
-package fr.rakambda.tools.api.cache
+package fr.rakambda.watchedpostermaker.tools.api.cache
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

@@ -43,7 +43,7 @@ class TraktProcessor(
         logger.info { "Found ${activities.size} new Trakt activities since $previousActivityDate" }
         activities.forEach { makePosterFromActivity(it) }
 
-        executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, username, activities.maxOfOrNull { it.watchedAt }?.toInstant()?.toEpochMilli()?.toString())
+        activities.maxOfOrNull { it.watchedAt }?.toInstant()?.toEpochMilli()?.let { executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, username, it.toString()) }
     }
 
     private suspend fun makePosterFromActivity(activity: TraktApi.TraktResponse.UserHistory) {

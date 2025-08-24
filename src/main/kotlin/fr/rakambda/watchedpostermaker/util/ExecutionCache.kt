@@ -1,12 +1,12 @@
 package fr.rakambda.watchedpostermaker.util
 
-import fr.rakambda.tools.api.cache.CacheDatabaseHandler
+import fr.rakambda.watchedpostermaker.tools.api.cache.CacheDatabaseHandler
 
 class ExecutionCache(
     private val database: CacheDatabaseHandler
 ) {
     fun getOrDefault(category: String, key: String, defaultValue: String): String {
-        return database.getValue(category, key) ?: defaultValue
+        return database.getValue(category, key).takeIf { it != "null" } ?: defaultValue
     }
 
     fun setValue(category: String, key: String, value: String?) {

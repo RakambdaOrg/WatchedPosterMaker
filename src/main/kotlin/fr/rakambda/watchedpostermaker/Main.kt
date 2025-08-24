@@ -1,6 +1,6 @@
 package fr.rakambda.watchedpostermaker
 
-import fr.rakambda.tools.api.cache.CacheDatabaseHandler
+import fr.rakambda.watchedpostermaker.tools.api.cache.CacheDatabaseHandler
 import fr.rakambda.watchedpostermaker.processor.AnilistProcessor
 import fr.rakambda.watchedpostermaker.processor.TraktProcessor
 import fr.rakambda.watchedpostermaker.util.ExecutionCache

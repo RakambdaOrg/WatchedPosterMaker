@@ -47,7 +47,7 @@ class AnilistProcessor(
         logger.info { "Found ${activities.size} new AniList activities since $previousActivityDate" }
         activities.forEach { makePosterFromActivity(it) }
 
-        executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), activities.maxOfOrNull { it.createdAt }?.toInstant()?.toEpochMilli()?.toString())
+        activities.maxOfOrNull { it.createdAt }?.toInstant()?.toEpochMilli()?.let { executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), it.toString()) }
     }
 
     private suspend fun processFromHistory() {
@@ -63,7 +63,7 @@ class AnilistProcessor(
         logger.info { "Found ${medias.size} new AniList media list updates since $previousUpdateDate" }
         medias.forEach { makePosterFromMediaList(it) }
 
-        executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), medias.maxOfOrNull { it.updatedAt }?.toInstant()?.toEpochMilli().toString())
+        medias.maxOfOrNull { it.updatedAt }?.toInstant()?.toEpochMilli()?.let { executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), it.toString()) }
     }
 
     private suspend fun makePosterFromActivity(activity: AnilistApi.GqlResponse.ActivityData) {
