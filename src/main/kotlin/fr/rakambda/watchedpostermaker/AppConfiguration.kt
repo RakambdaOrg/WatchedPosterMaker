@@ -37,6 +37,7 @@ data class AppConfiguration(
         @field:JsonProperty("outputFolder") val output: File,
         @field:JsonProperty("runFromActivity") val runFromActivity: Boolean = false,
         @field:JsonProperty("runFromHistory") val runFromHistory: Boolean = false,
+        @field:JsonProperty("historyOnlyLast") val historyOnlyLast: Boolean = false,
     )
 
     data class Trakt(

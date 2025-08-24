@@ -15,6 +15,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 
 class AnilistProcessor(
     private val executionCache: ExecutionCache
@@ -74,7 +75,7 @@ class AnilistProcessor(
 
     private suspend fun makePosterFromMediaList(activity: AnilistApi.GqlResponse.MediaListData) {
         val previousProgress = executionCache.getOrDefault(CACHE_CATEGORY_MEDIA_LIST_PROGRESS, activity.id.toString(), "0").toInt()
-        val progress = Progress(previousProgress + 1, activity.progress)
+        val progress = if (config.historyOnlyLast) Progress(max(previousProgress + 1, activity.progress), activity.progress) else Progress(previousProgress + 1, activity.progress)
         makePoster(activity.updatedAt, activity.media, progress)
         executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_PROGRESS, activity.id.toString(), activity.progress.toString())
     }
