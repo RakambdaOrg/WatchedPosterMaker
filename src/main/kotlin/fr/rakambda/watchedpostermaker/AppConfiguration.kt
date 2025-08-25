@@ -45,6 +45,7 @@ data class AppConfiguration(
         @field:JsonProperty("token") val token: String,
         @field:JsonProperty("outputFolder") val output: File,
         @field:JsonProperty("runFromActivity") val runFromActivity: Boolean = false,
+        @field:JsonProperty("activityOnlyCompleted") val activityOnlyCompleted: Boolean = false,
     )
 
     data class Tmdb(

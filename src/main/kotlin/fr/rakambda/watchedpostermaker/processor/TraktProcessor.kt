@@ -20,6 +20,7 @@ class TraktProcessor(
 ) {
     private val logger = KotlinLogging.logger {}
     private val config = AppConfiguration.instance.trakt
+    private val seasonCache = mutableMapOf<Long, List<TraktApi.TraktResponse.ShowSeason>>()
 
     companion object {
         private const val CACHE_CATEGORY_LAST_ACTIVITY = "trakt_activity_last-date"
@@ -48,7 +49,9 @@ class TraktProcessor(
 
     private suspend fun makePosterFromActivity(activity: TraktApi.TraktResponse.UserHistory) {
         activity.movie?.let { makePosterFromMovie(activity.watchedAt, it) }
-        if (activity.show != null && activity.episode != null) makePosterFromShow(activity.watchedAt, activity.show, activity.episode)
+        if (activity.show != null && activity.episode != null) {
+            makePosterFromShow(activity.watchedAt, activity.show, activity.episode)
+        }
     }
 
     private suspend fun makePosterFromMovie(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media) {
@@ -56,7 +59,14 @@ class TraktProcessor(
     }
 
     private suspend fun makePosterFromShow(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, episode: TraktApi.TraktResponse.UserHistory.Episode) {
-        makePoster(watchedAt, media, "S${episode.season.fixed(2)}E${episode.number.fixed(2)}", PosterLoader.TmdbPosterLoader.forTv(media.ids.tmdb))
+        val text = if (config.activityOnlyCompleted) {
+            val season = seasonCache.getOrPut(media.ids.trakt) { TraktApi.getShowSeasons(media.ids.trakt.toString()) }
+            val episodeCount = season.first { it.number == episode.season }.episodeCount
+            if (episode.number != episodeCount) return
+            "S${episode.season.fixed(2)}"
+        } else "S${episode.season.fixed(2)}E${episode.number.fixed(2)}"
+
+        makePoster(watchedAt, media, text, PosterLoader.TmdbPosterLoader.forTv(media.ids.tmdb))
     }
 
     private suspend fun makePoster(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, text: String, posterLoader: PosterLoader) {

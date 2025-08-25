@@ -71,6 +71,15 @@ object TraktApi {
         )
     }
 
+    suspend fun getShowSeasons(id: String): List<TraktResponse.ShowSeason> {
+        return handleResponse<List<TraktResponse.ShowSeason>>(client.get {
+            url {
+                appendPathSegments("shows", id, "seasons")
+                parameters.append("extended", "full")
+            }
+        }).second
+    }
+
     private suspend inline fun <reified T> pagedQuery(
         queryRunner: suspend (page: Int) -> Pair<Headers, List<T>>,
         maxPages: Int = Int.MAX_VALUE,
@@ -120,6 +129,7 @@ object TraktApi {
                 val ids: MediaIds,
             ) {
                 data class MediaIds(
+                    val trakt: Long,
                     val tmdb: Long,
                 )
             }
@@ -129,6 +139,11 @@ object TraktApi {
                 val season: Int,
             )
         }
+
+        data class ShowSeason(
+            val number: Int,
+            @field:JsonProperty("episode_count") val episodeCount: Int,
+        )
     }
 
     class TraktApiException(
