@@ -83,6 +83,13 @@ class AnilistProcessor(
     private suspend fun makePoster(watchedAt: ZonedDateTime, media: AnilistApi.GqlResponse.Media, progress: Progress) {
         val poster = PosterLoader.StaticPosterLoader(URI.create(media.coverImage.extraLarge).toURL()).loadPoster()
 
+        if (when (media.type) {
+                "ANIME" -> config.includeAnime
+                "MANGA" -> config.includeManga
+                else -> true
+            }.not()
+        ) return
+
         for (index in progress.start..(progress.end ?: progress.start)) {
             val text = when (media.type) {
                 "ANIME" -> "E${index.fixed(2)}"

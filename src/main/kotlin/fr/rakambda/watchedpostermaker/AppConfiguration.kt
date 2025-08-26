@@ -38,6 +38,8 @@ data class AppConfiguration(
         @field:JsonProperty("runFromActivity") val runFromActivity: Boolean = false,
         @field:JsonProperty("runFromHistory") val runFromHistory: Boolean = false,
         @field:JsonProperty("historyOnlyLast") val historyOnlyLast: Boolean = false,
+        @field:JsonProperty("includeAnime") val includeAnime: Boolean = true,
+        @field:JsonProperty("includeManga") val includeManga: Boolean = true,
     )
 
     data class Trakt(
