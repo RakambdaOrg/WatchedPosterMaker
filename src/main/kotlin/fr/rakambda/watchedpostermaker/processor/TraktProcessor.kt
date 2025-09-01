@@ -55,7 +55,7 @@ class TraktProcessor(
     }
 
     private suspend fun makePosterFromMovie(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media) {
-        makePoster(watchedAt, media, "", PosterLoader.TmdbPosterLoader.forMovie(media.ids.tmdb))
+        makePoster(watchedAt, media, null, PosterLoader.TmdbPosterLoader.forMovie(media.ids.tmdb))
     }
 
     private suspend fun makePosterFromShow(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, episode: TraktApi.TraktResponse.UserHistory.Episode) {
@@ -69,14 +69,14 @@ class TraktProcessor(
         makePoster(watchedAt, media, text, PosterLoader.TmdbPosterLoader.forTv(media.ids.tmdb))
     }
 
-    private suspend fun makePoster(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, text: String, posterLoader: PosterLoader) {
+    private suspend fun makePoster(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, text: String?, posterLoader: PosterLoader) {
         val outFile = config.output.resolve("${DF.format(watchedAt.withZoneSameInstant(ZoneId.systemDefault()))}-trakt-${media.ids.tmdb}-$text.png")
         if (outFile.exists()) return
 
         logger.info { "Creating poster for media `${media.ids.tmdb}` at `$text`. Will be saved at `$outFile`" }
         val poster = posterLoader.loadPoster()
 
-        val newImage = PosterLabeler.SimplePosterLabeler().addLabel(poster.clone(), text)
+        val newImage = if (text.isNullOrBlank()) poster else PosterLabeler.SimplePosterLabeler().addLabel(poster.clone(), text)
         PosterSaver.StaticPosterSaver(outFile).savePoster(newImage)
     }
 }
