@@ -72,7 +72,13 @@ object TmdbApi {
 
     data class MediaDetails(
         @field:JsonProperty("poster_path") val posterPath: String,
-    )
+        @field:JsonProperty("seasons") val seasons: List<Season> = listOf(),
+    ) {
+        data class Season(
+            @field:JsonProperty("season_number") val seasonNumber: Int,
+            @field:JsonProperty("poster_path") val posterPath: String,
+        )
+    }
 
     class TmdbApiException(
         message: String?,

@@ -19,10 +19,14 @@ sealed interface PosterLoader {
         }
     }
 
-    class TmdbPosterLoader(private val id: Long, private val type: TmdbType) : PosterLoader {
+    class TmdbPosterLoader(
+        private val id: Long,
+        private val season: Int,
+        private val type: TmdbType,
+    ) : PosterLoader {
         companion object {
-            fun forMovie(id: Long) = TmdbPosterLoader(id, TmdbType.MOVIE)
-            fun forTv(id: Long) = TmdbPosterLoader(id, TmdbType.TV)
+            fun forMovie(id: Long) = TmdbPosterLoader(id, 1, TmdbType.MOVIE)
+            fun forTv(id: Long, season: Int) = TmdbPosterLoader(id, season, TmdbType.TV)
         }
 
         enum class TmdbType {
@@ -34,7 +38,13 @@ sealed interface PosterLoader {
             return CACHE.getOrPut("tmdb://$type-$id") {
                 val path = when (type) {
                     TmdbType.MOVIE -> TmdbApi.getMovieDetails(id).posterPath
-                    TmdbType.TV -> TmdbApi.getTvDetails(id).posterPath
+                    TmdbType.TV -> {
+                        val details = TmdbApi.getTvDetails(id)
+                        details.seasons
+                            .firstOrNull { it.seasonNumber == season }
+                            ?.posterPath
+                            ?: details.posterPath
+                    }
                 }
                 val url = URI.create("https://image.tmdb.org/t/p/original/${path.trimStart('/')}").toURL()
                 ImageIO.read(url)

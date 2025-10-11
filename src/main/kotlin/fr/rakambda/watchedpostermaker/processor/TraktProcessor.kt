@@ -66,7 +66,7 @@ class TraktProcessor(
             "S${episode.season.fixed(2)}"
         } else "S${episode.season.fixed(2)}E${episode.number.fixed(2)}"
 
-        makePoster(watchedAt, media, text, PosterLoader.TmdbPosterLoader.forTv(media.ids.tmdb))
+        makePoster(watchedAt, media, text, PosterLoader.TmdbPosterLoader.forTv(media.ids.tmdb, episode.season))
     }
 
     private suspend fun makePoster(watchedAt: ZonedDateTime, media: TraktApi.TraktResponse.UserHistory.Media, text: String?, posterLoader: PosterLoader) {
