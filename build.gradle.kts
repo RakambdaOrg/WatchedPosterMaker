@@ -37,7 +37,6 @@ kotlin {
 
 application {
     mainClass.set("fr.rakambda.watchedpostermaker.MainKt")
-    applicationDefaultJvmArgs = listOf("-Dlogback.configurationFile=logback-local.xml")
 }
 
 ktor {
