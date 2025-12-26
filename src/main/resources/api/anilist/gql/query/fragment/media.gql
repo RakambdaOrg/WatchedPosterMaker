@@ -5,4 +5,7 @@ fragment MediaParts on Media {
         extraLarge
     }
     type
+    episodes
+    chapters
+    status(version: 2)
 }

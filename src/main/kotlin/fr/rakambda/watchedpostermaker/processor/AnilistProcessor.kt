@@ -2,6 +2,9 @@ package fr.rakambda.watchedpostermaker.processor
 
 import fr.rakambda.watchedpostermaker.AppConfiguration
 import fr.rakambda.watchedpostermaker.api.AnilistApi
+import fr.rakambda.watchedpostermaker.api.AnilistApi.GqlResponse.Media.Status.FINISHED
+import fr.rakambda.watchedpostermaker.api.AnilistApi.GqlResponse.Media.Type.ANIME
+import fr.rakambda.watchedpostermaker.api.AnilistApi.GqlResponse.Media.Type.MANGA
 import fr.rakambda.watchedpostermaker.labeler.PosterLabeler
 import fr.rakambda.watchedpostermaker.loader.PosterLoader
 import fr.rakambda.watchedpostermaker.saver.PosterSaver
@@ -40,7 +43,13 @@ class AnilistProcessor(
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
         val previousActivityDate = ZonedDateTime.ofInstant(
-            Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong()),
+            Instant.ofEpochMilli(
+                executionCache.getOrDefault(
+                    CACHE_CATEGORY_LAST_ACTIVITY,
+                    userId.toString(),
+                    Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()
+                ).toLong()
+            ),
             ZoneId.systemDefault()
         )
 
@@ -48,7 +57,8 @@ class AnilistProcessor(
         logger.info { "Found ${activities.size} new AniList activities since $previousActivityDate" }
         activities.forEach { makePosterFromActivity(it) }
 
-        activities.maxOfOrNull { it.createdAt }?.toInstant()?.toEpochMilli()?.let { executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), it.toString()) }
+        activities.maxOfOrNull { it.createdAt }?.toInstant()?.toEpochMilli()
+            ?.let { executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), it.toString()) }
     }
 
     private suspend fun processFromHistory() {
@@ -56,7 +66,13 @@ class AnilistProcessor(
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
         val previousUpdateDate = ZonedDateTime.ofInstant(
-            Instant.ofEpochMilli(executionCache.getOrDefault(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()).toLong()),
+            Instant.ofEpochMilli(
+                executionCache.getOrDefault(
+                    CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE,
+                    userId.toString(),
+                    Instant.now().minusSeconds(TimeUnit.DAYS.toSeconds(30)).toEpochMilli().toString()
+                ).toLong()
+            ),
             ZoneId.systemDefault()
         )
 
@@ -64,7 +80,8 @@ class AnilistProcessor(
         logger.info { "Found ${medias.size} new AniList media list updates since $previousUpdateDate" }
         medias.forEach { makePosterFromMediaList(it) }
 
-        medias.maxOfOrNull { it.updatedAt }?.toInstant()?.toEpochMilli()?.let { executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), it.toString()) }
+        medias.maxOfOrNull { it.updatedAt }?.toInstant()?.toEpochMilli()
+            ?.let { executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_LAST_UPDATE, userId.toString(), it.toString()) }
     }
 
     private suspend fun makePosterFromActivity(activity: AnilistApi.GqlResponse.ActivityData) {
@@ -75,28 +92,37 @@ class AnilistProcessor(
 
     private suspend fun makePosterFromMediaList(activity: AnilistApi.GqlResponse.MediaListData) {
         val previousProgress = executionCache.getOrDefault(CACHE_CATEGORY_MEDIA_LIST_PROGRESS, activity.id.toString(), "0").toInt()
-        val progress = if (config.historyOnlyLast) Progress(max(previousProgress + 1, activity.progress), activity.progress) else Progress(previousProgress + 1, activity.progress)
+        val progress = if (config.historyOnlyLast) Progress(
+            max(previousProgress + 1, activity.progress),
+            activity.progress
+        ) else Progress(previousProgress + 1, activity.progress)
         makePoster(activity.updatedAt, activity.media, progress)
         executionCache.setValue(CACHE_CATEGORY_MEDIA_LIST_PROGRESS, activity.id.toString(), activity.progress.toString())
     }
 
     private suspend fun makePoster(watchedAt: ZonedDateTime, media: AnilistApi.GqlResponse.Media, progress: Progress) {
-        val poster = PosterLoader.StaticPosterLoader(URI.create(media.coverImage.extraLarge).toURL()).loadPoster()
-
         if (when (media.type) {
-                "ANIME" -> config.includeAnime
-                "MANGA" -> config.includeManga
-                else -> true
+                ANIME -> config.includeAnime
+                MANGA -> config.includeManga
             }.not()
         ) return
 
+        val isFinished = media.status === FINISHED && (progress.end ?: progress.start) == when (media.type) {
+            ANIME -> media.episodes
+            MANGA -> media.chapters
+        }
+        if (config.historyOnlyCompleted && isFinished.not()) return
+
+        val poster = PosterLoader.StaticPosterLoader(URI.create(media.coverImage.extraLarge).toURL()).loadPoster()
+
         for (index in progress.start..(progress.end ?: progress.start)) {
             val text = when (media.type) {
-                "ANIME" -> "E${index.fixed(2)}"
-                "MANGA" -> "CH${index.fixed(3)}"
-                else -> index.toString()
+                ANIME -> "E${index.fixed(2)}"
+                MANGA -> "CH${index.fixed(3)}"
             }
-            val outFile = config.output.resolve("${DF.format(watchedAt.withZoneSameInstant(ZoneId.systemDefault()))}-anilist-${media.id}-$index.png")
+
+            val outFile =
+                config.output.resolve("${DF.format(watchedAt.withZoneSameInstant(ZoneId.systemDefault()))}-anilist-${media.id}-$index.png")
             if (outFile.exists()) continue
 
             this.logger.info { "Creating poster for media `${media.id}` at index `$index`. Will be saved at `$outFile`" }

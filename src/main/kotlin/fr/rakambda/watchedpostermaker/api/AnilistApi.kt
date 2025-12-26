@@ -109,7 +109,8 @@ object AnilistApi {
     }
 
     private suspend inline fun <reified T> postGql(queryName: String, variables: Map<String, Any>): GqlResponse<T> {
-        val resource = AnilistApi::class.java.getResource("/api/anilist/gql/query/$queryName.gql") ?: throw AnilistApiException("Query $queryName not found")
+        val resource = AnilistApi::class.java.getResource("/api/anilist/gql/query/$queryName.gql")
+            ?: throw AnilistApiException("Query $queryName not found")
         val payload = GqlQuery(GraphQlUtils.readQuery(resource), variables)
         val response = client.post {
             contentType(ContentType.Application.Json)
@@ -188,12 +189,28 @@ object AnilistApi {
         data class Media(
             val id: Int,
             val coverImage: Image,
-            val type: String,
+            val type: Type,
+            val chapters: Int?,
+            val episodes: Int?,
+            val status: Status,
         ) {
             data class Image(
                 val extraLarge: String,
                 val large: String,
             )
+
+            enum class Type {
+                ANIME,
+                MANGA,
+            }
+
+            enum class Status {
+                CANCELLED,
+                FINISHED,
+                HIATUS,
+                NOT_YET_RELEASED,
+                RELEASING,
+            }
         }
     }
 
