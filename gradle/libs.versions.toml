@@ -2,7 +2,7 @@
 jacksonVersion = "2.20.1"
 dotenvVersion = "6.5.1"
 log4j2-version = "2.25.3"
-kotlinLoggingVersion = "7.0.13"
+kotlinLoggingVersion = "7.0.14"
 exposedVersion = "0.61.0"
 mariadbVersion = "3.5.7"
 sqliteVersion = "3.51.1.0"
