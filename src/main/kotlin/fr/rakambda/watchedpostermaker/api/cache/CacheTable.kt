@@ -1,7 +1,6 @@
 package fr.rakambda.watchedpostermaker.tools.api.cache
 
-import org.jetbrains.exposed.dao.id.CompositeIdTable
-import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.v1.core.dao.id.CompositeIdTable
 
 object CacheTable : CompositeIdTable("Cache") {
     val category = varchar("Category", 64)

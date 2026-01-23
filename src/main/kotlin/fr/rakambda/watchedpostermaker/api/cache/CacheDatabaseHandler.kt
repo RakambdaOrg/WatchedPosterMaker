@@ -1,8 +1,9 @@
 package fr.rakambda.watchedpostermaker.tools.api.cache
 
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -54,13 +55,9 @@ class CacheDatabaseHandler(
         }
     }
 
-    private inline fun <T> ReadWriteLock.withReadLock(block: () -> T): T {
-        readLock().withLock { return block() }
-    }
+    private inline fun <T> ReadWriteLock.withReadLock(block: () -> T): T = readLock().withLock { return block() }
 
-    private inline fun <T> ReadWriteLock.withWriteLock(block: () -> T): T {
-        writeLock().withLock { return block() }
-    }
+    private inline fun <T> ReadWriteLock.withWriteLock(block: () -> T): T = writeLock().withLock { return block() }
 
     private inline fun <T> Lock.withLock(block: () -> T): T {
         lock()
