@@ -32,6 +32,7 @@ class TraktProcessor(
     }
 
     private suspend fun processFromActivity() {
+        logger.info { "Processing Trakt from activity" }
         config.output.mkdirs()
 
         val username = TraktApi.getUsername()

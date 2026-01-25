@@ -152,6 +152,7 @@ object AnilistApi {
 
         data class GqlError(
             val message: String,
+            val status: Int,
         )
 
         data class PageInfo(

@@ -49,7 +49,7 @@ sealed interface PosterLabeler {
 
             val textWidth = metrics.stringWidth(text)
             val textX = (panelWidth - textWidth) / 2
-            val textY = panelHeight - 40
+            val textY = panelHeight - 80
 
             val paddingX = max(4, 25 - textWidth)
             val paddingY = 2

@@ -39,6 +39,7 @@ class AnilistProcessor(
     }
 
     private suspend fun processFromActivity() {
+        logger.info { "Processing AniList from activity" }
         config.output.mkdirs()
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
@@ -62,6 +63,7 @@ class AnilistProcessor(
     }
 
     private suspend fun processFromHistory() {
+        logger.info { "Processing AniList from history" }
         config.output.mkdirs()
 
         val userId = AnilistApi.getViewerId() ?: throw IllegalStateException("Viewer id is null")
