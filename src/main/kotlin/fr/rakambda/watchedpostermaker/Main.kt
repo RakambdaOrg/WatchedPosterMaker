@@ -24,6 +24,7 @@ suspend fun main(args: Array<String>) {
     try {
         AnilistProcessor(executionCache).process()
         TraktProcessor(executionCache).process()
+        logger.info { "Done" }
     } catch (e: Throwable) {
         logger.error(e) { "Uncaught exception" }
     }

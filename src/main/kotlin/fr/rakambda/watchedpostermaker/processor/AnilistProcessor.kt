@@ -55,7 +55,7 @@ class AnilistProcessor(
 
         val activities = AnilistApi.getUserActivity(userId, previousActivityDate)
         logger.info { "Found ${activities.size} new AniList activities since $previousActivityDate" }
-        activities.forEach { makePosterFromActivity(it) }
+        activities.sortedBy { it.createdAt }.forEach { makePosterFromActivity(it) }
 
         activities.maxOfOrNull { it.createdAt }?.toInstant()?.toEpochMilli()
             ?.let { executionCache.setValue(CACHE_CATEGORY_LAST_ACTIVITY, userId.toString(), it.toString()) }
