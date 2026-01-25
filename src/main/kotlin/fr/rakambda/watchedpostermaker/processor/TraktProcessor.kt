@@ -76,7 +76,7 @@ class TraktProcessor(
         logger.info { "Creating poster for media `${media.ids.tmdb}` at `$text`. Will be saved at `$outFile`" }
         val poster = posterLoader.loadPoster()
 
-        val newImage = if (text.isNullOrBlank()) poster else PosterLabeler.SimplePosterLabeler().addLabel(poster.clone(), text)
+        val newImage = PosterLabeler.SimplePosterLabeler().addLabel(poster.clone(), text)
         PosterSaver.StaticPosterSaver(outFile).savePoster(newImage)
     }
 }

@@ -121,8 +121,7 @@ class AnilistProcessor(
                 MANGA -> "CH${index.fixed(3)}"
             }
 
-            val outFile =
-                config.output.resolve("${DF.format(watchedAt.withZoneSameInstant(ZoneId.systemDefault()))}-anilist-${media.id}-$index.png")
+            val outFile = config.output.resolve("${DF.format(watchedAt.withZoneSameInstant(ZoneId.systemDefault()))}-anilist-${media.id}-$index.png")
             if (outFile.exists()) continue
 
             this.logger.info { "Creating poster for media `${media.id}` at index `$index`. Will be saved at `$outFile`" }
