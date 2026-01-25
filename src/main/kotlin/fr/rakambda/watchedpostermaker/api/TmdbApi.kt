@@ -76,7 +76,7 @@ object TmdbApi {
     ) {
         data class Season(
             @field:JsonProperty("season_number") val seasonNumber: Int,
-            @field:JsonProperty("poster_path") val posterPath: String,
+            @field:JsonProperty("poster_path") val posterPath: String? = null,
         )
     }
 
