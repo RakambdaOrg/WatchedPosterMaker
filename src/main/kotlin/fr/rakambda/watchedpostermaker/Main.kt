@@ -1,9 +1,12 @@
 package fr.rakambda.watchedpostermaker
 
-import fr.rakambda.watchedpostermaker.tools.api.cache.CacheDatabaseHandler
 import fr.rakambda.watchedpostermaker.processor.AnilistProcessor
 import fr.rakambda.watchedpostermaker.processor.TraktProcessor
+import fr.rakambda.watchedpostermaker.tools.api.cache.CacheDatabaseHandler
 import fr.rakambda.watchedpostermaker.util.ExecutionCache
+import io.github.oshai.kotlinlogging.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
 
 suspend fun main(args: Array<String>) {
     System.setProperty("fr.rakambda.configLocation", args.getOrNull(0) ?: "config.yaml")
@@ -18,6 +21,10 @@ suspend fun main(args: Array<String>) {
     }
     val executionCache: ExecutionCache by lazy { ExecutionCache(cacheDatabaseHandler) }
 
-    AnilistProcessor(executionCache).process()
-    TraktProcessor(executionCache).process()
+    try {
+        AnilistProcessor(executionCache).process()
+        TraktProcessor(executionCache).process()
+    } catch (e: Throwable) {
+        logger.error(e) { "Uncaught exception" }
+    }
 }
