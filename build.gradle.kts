@@ -14,7 +14,7 @@ repositories {
 dependencies {
     implementation(platform(libs.jacksonBom))
     implementation(platform(libs.log4j2Bom))
-    
+
     implementation(libs.dotenvKotlin)
     implementation(libs.bundles.logging)
     implementation(libs.bundles.jackson)
@@ -29,6 +29,14 @@ dependencies {
     implementation("io.ktor:ktor-client-logging")
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-serialization-jackson")
+
+    testImplementation(kotlin("test-junit5"))
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
 }
 
 kotlin {
