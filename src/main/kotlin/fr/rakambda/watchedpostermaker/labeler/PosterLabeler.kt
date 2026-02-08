@@ -89,9 +89,10 @@ sealed interface PosterLabeler {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
             g2d.composite = AlphaComposite.Clear
+            g2d.color = Color.BLACK
             g2d.fillRect(0, 0, targetWidth, targetHeight)
-            g2d.composite = AlphaComposite.SrcOver
 
+            g2d.composite = AlphaComposite.SrcOver
             g2d.drawImage(image, x, y, scaledWidth, scaledHeight, null)
             g2d.dispose()
 
