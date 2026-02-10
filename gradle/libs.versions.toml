@@ -5,7 +5,7 @@ log4j2-version = "2.25.3"
 kotlinLoggingVersion = "7.0.14"
 exposedVersion = "1.0.0"
 mariadbVersion = "3.5.7"
-sqliteVersion = "3.51.1.0"
+sqliteVersion = "3.51.2.0"
 
 [libraries]
 jacksonBom = { group = "com.fasterxml.jackson", name = "jackson-bom", version.ref = "jacksonVersion"}
