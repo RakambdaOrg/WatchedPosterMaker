@@ -1,5 +1,5 @@
 [versions]
-jacksonVersion = "2.21.0"
+jacksonVersion = "2.21.1"
 dotenvVersion = "6.5.1"
 log4j2-version = "2.25.3"
 kotlinLoggingVersion = "8.0.01"
