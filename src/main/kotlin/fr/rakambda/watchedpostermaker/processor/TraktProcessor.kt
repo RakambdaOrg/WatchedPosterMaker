@@ -28,7 +28,11 @@ class TraktProcessor(
     }
 
     suspend fun process() {
-        if (config.runFromActivity) processFromActivity()
+        try {
+            if (config.runFromActivity) processFromActivity()
+        } catch (e: TraktApi.TraktApiException) {
+            logger.warn(e) { "Stopping Trakt processing due to API error" }
+        }
     }
 
     private suspend fun processFromActivity() {

@@ -34,8 +34,12 @@ class AnilistProcessor(
     }
 
     suspend fun process() {
-        if (config.runFromActivity) processFromActivity()
-        if (config.runFromHistory) processFromHistory()
+        try {
+            if (config.runFromActivity) processFromActivity()
+            if (config.runFromHistory) processFromHistory()
+        } catch (e: AnilistApi.AnilistApiException) {
+            logger.warn(e) { "Stopping AniList processing due to API error" }
+        }
     }
 
     private suspend fun processFromActivity() {
