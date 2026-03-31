@@ -1,7 +1,7 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.3.20"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
-    id("io.ktor.plugin") version "3.4.1"
+    id("io.ktor.plugin") version "3.4.2"
 }
 
 group = "fr.rakambda"
