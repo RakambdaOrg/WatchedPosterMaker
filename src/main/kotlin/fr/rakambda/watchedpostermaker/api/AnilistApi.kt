@@ -1,5 +1,7 @@
 package fr.rakambda.watchedpostermaker.api
 
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.StreamReadFeature
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import fr.rakambda.watchedpostermaker.AppConfiguration
@@ -33,6 +35,7 @@ object AnilistApi {
         install(ContentNegotiation) {
             jackson {
                 disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
             }
         }
         install(DefaultRequest) {

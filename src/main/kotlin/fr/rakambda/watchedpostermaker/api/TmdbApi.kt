@@ -1,6 +1,7 @@
 package fr.rakambda.watchedpostermaker.api
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
 import fr.rakambda.watchedpostermaker.AppConfiguration
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -28,6 +29,7 @@ object TmdbApi {
         install(ContentNegotiation) {
             jackson {
                 disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
             }
         }
         install(DefaultRequest) {
