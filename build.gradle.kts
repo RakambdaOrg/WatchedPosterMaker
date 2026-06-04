@@ -33,14 +33,20 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
 }
 
-tasks {
-    test {
-        useJUnitPlatform()
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_26
     }
 }
 
-kotlin {
-    jvmToolchain(21)
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "26"
+    targetCompatibility = "26"
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 application {
@@ -49,7 +55,8 @@ application {
 
 ktor {
     docker {
-        jreVersion.set(JavaVersion.VERSION_21)
+        jreVersion.set(JavaVersion.VERSION_26)
+        customBaseImage = "eclipse-temurin:26-jdk-alpine"
         imageTag.set(providers.gradleProperty("ktor.docker.tag").orElse("latest"))
         externalRegistry.set(
             io.ktor.plugin.features.DockerImageRegistry.externalRegistry(
