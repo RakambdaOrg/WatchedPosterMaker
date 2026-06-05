@@ -56,7 +56,6 @@ application {
 ktor {
     docker {
         jreVersion.set(JavaVersion.VERSION_26)
-        customBaseImage = "eclipse-temurin:26-jdk-alpine"
         imageTag.set(providers.gradleProperty("ktor.docker.tag").orElse("latest"))
         externalRegistry.set(
             io.ktor.plugin.features.DockerImageRegistry.externalRegistry(
