@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import fr.rakambda.watchedpostermaker.AppConfiguration
+import fr.rakambda.watchedpostermaker.api.trakt.TraktTokenHandler
 import fr.rakambda.watchedpostermaker.util.JacksonUtils.ISO8601ZonedDateTimeDeserializer
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
@@ -24,10 +25,12 @@ import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 object TraktApi {
     private val logger = KotlinLogging.logger {}
+    private val tokenHandler by lazy { TraktTokenHandler(AppConfiguration.instance.trakt) }
     private val client = HttpClient {
         install(Auth) {
             bearer {
-                loadTokens { BearerTokens(AppConfiguration.instance.trakt.token, null) }
+                loadTokens { BearerTokens(tokenHandler.getAccessToken(), null) }
+                refreshTokens { BearerTokens(tokenHandler.refreshAccessToken(oldTokens?.accessToken), null) }
                 sendWithoutRequest { true }
             }
         }
