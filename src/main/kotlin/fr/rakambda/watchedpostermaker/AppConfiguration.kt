@@ -45,7 +45,9 @@ data class AppConfiguration(
 
     data class Trakt(
         @field:JsonProperty("clientId") val clientId: String,
-        @field:JsonProperty("token") val token: String,
+        @field:JsonProperty("clientSecret") val clientSecret: String,
+        @field:JsonProperty("userId") val userId: Long,
+        @field:JsonProperty("database") val database: Database,
         @field:JsonProperty("outputFolder") val output: File,
         @field:JsonProperty("runFromActivity") val runFromActivity: Boolean = false,
         @field:JsonProperty("activityOnlyCompleted") val activityOnlyCompleted: Boolean = false,
