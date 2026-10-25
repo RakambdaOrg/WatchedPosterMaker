@@ -4,7 +4,7 @@ dotenvVersion = "6.5.1"
 log4j2-version = "2.26.1"
 kotlinLoggingVersion = "8.0.4"
 exposedVersion = "1.6.0"
-mariadbVersion = "3.5.10"
+mariadbVersion = "4.0.0"
 sqliteVersion = "3.53.4.0"
 
 [libraries]
