@@ -124,7 +124,8 @@ object AnilistApi {
 
     private suspend inline fun <reified T : GqlResponse<*>> handleResponse(response: HttpResponse): Pair<HttpResponse, T> {
         if (!response.status.isSuccess()) {
-            logger.error { "Invalid response with status ${response.status}" }
+            val errorBody = response.bodyAsText()
+            logger.error { "Invalid response with status ${response.status}: $errorBody" }
             throw AnilistApiException("Invalid Anilist response")
         }
         val body = response.body<T>()
